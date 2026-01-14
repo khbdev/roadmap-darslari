@@ -5,49 +5,63 @@ import (
 	"fmt"
 	"go-postgres/config"
 	"go-postgres/model"
+	"log"
 	"net/http"
-
-	_ "github.com/lib/pq"
-) 
+)
 
 func main(){
-config.Connect()
+	config.Connect()
 
-http.HandleFunc("/users", userHandler)
+	http.HandleFunc("/users", UserHandler)
 
-defer http.ListenAndServe(":8081", nil) 
-fmt.Println("http server running , 8081 port")
+ defer	http.ListenAndServe(":8081", nil)
+
+ fmt.Println("Server Running :8081")
+
 }
 
 
-
-func userHandler(w http.ResponseWriter, r *http.Request){
-	switch r.Method{
+func UserHandler(w http.ResponseWriter, r *http.Request){
+	switch r.Method {
 	case http.MethodGet:
-		getUsers(w)
+		GetUSers(w)
+	case http.MethodPost:
+		PostUsers(w, r)
 	}
 }
 
 
-
-func getUsers(w http.ResponseWriter){
+func GetUSers(w http.ResponseWriter){
 	rows, err := config.DB.Query("SELECT id, name, email FROM users")
 	if  err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		log.Fatal(err)
 	}
-	defer rows.Close()
 
 	var users []model.User
-	for rows.Next() {
+	for rows.Next(){
 		var u model.User
-		if err := rows.Scan(&u.ID, &u.Name, &u.Email); err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		if  err := rows.Scan(&u.ID, &u.Name, &u.Email); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
 		users = append(users, u)
 	}
+  json.NewEncoder(w).Encode(users)
+}
 
-	json.NewEncoder(w).Encode(users)
+func PostUsers(w http.ResponseWriter, r *http.Request){
+	var u model.User
+if err := json.NewDecoder(r.Body).Decode(&u); err != nil {
+    http.Error(w, "invalid json", http.StatusBadRequest)
+    return
+}
 
+
+	err := config.DB.QueryRow("INSERT INTO users(name, email) VALUES ($1, $2) RETURNING id", u.Name, u.Email).Scan(&u.ID)
+	if err != nil {
+	http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+	}
+   w.Header().Set("Content-type", "application/json")
+	json.NewEncoder(w).Encode(u)
 }
