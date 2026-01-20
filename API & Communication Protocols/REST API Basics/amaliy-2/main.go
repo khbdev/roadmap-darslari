@@ -36,19 +36,19 @@ func validateUser(req UserRequest) map[string]string {
 
 func ValidationMiddleware() gin.HandlerFunc {
 	return  func(ctx *gin.Context) {
-		var req UserRequest
-		if err := ctx.ShouldBindJSON(&req); err != nil {
+		var reqs UserRequest
+		if err := ctx.ShouldBindJSON(&reqs); err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error" : "Invalid Json"})
 			ctx.Abort()
 			return 
 		}
 
-		if err := validateUser(req); len(err) > 0 {
+		if err := validateUser(reqs); len(err) > 0 {
 			ctx.JSON(http.StatusBadRequest, gin.H{"errors": err})
 			ctx.Abort()
 			return 
 		}
-		ctx.Set("userRequest", req)
+		ctx.Set("userRequest", reqs)
 		ctx.Next()
 	}
 }
