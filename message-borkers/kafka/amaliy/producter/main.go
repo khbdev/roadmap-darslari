@@ -26,7 +26,8 @@ func main() {
 	})
 	defer w.Close()
 
-	event := UserCreated{
+	for i := 0; i < 10; i++ {
+		event := UserCreated{
 		ID:    1,
 		Name:  "Azizbek",
 		Email: "azizbek@example.com",
@@ -53,4 +54,5 @@ func main() {
 	}
 
 	fmt.Println("Sent to", topic, "=>", string(value))
+	}
 }
