@@ -38,7 +38,7 @@ func main() {
 		panic(err)
 	}
 
-	// Key bo'lsa: bir xil key -> doim bir xil partition (tartib saqlanadi)
+	
 	msg := kafka.Message{
 		Key:   []byte(fmt.Sprintf("user:%d", event.ID)),
 		Value: value,
@@ -52,5 +52,5 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Println("✅ Sent to", topic, "=>", string(value))
+	fmt.Println("Sent to", topic, "=>", string(value))
 }
