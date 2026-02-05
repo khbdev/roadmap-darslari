@@ -19,11 +19,10 @@ type UserCreated struct {
 func main() {
 	topic := "user.created"
 
-	// Writer = producer. U topic'ga message yozadi.
 	w := kafka.NewWriter(kafka.WriterConfig{
 		Brokers:  []string{"localhost:9092"},
 		Topic:    topic,
-		Balancer: &kafka.LeastBytes{}, // qaysi partition'ga tushishini "tarqatadi"
+		Balancer: &kafka.LeastBytes{}, 
 	})
 	defer w.Close()
 
