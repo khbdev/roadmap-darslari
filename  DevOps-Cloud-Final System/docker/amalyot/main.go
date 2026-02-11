@@ -25,5 +25,5 @@ func main() {
 	http.HandleFunc("/users", UserSwtich)
 
 	defer http.ListenAndServe(port, nil)
-	fmt.Printf("Server running %s", port)
+	fmt.Printf("Server runningg %s", port)
 }
